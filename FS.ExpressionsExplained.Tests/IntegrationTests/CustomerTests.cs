@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace FS.ExpressionsExplained.Tests.IntegrationTests
 {
     [TestClass]
-    public class RouteTests
+    public class CustomerTests
     {
         [TestMethod]
         public async Task WhenCustomerIsReceived_ItMatchesExpectedResult()

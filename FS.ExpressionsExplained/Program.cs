@@ -17,9 +17,10 @@ namespace FS.ExpressionsExplained.Client
     {
         public static async Task Main()
         {
-            //await InspectAnExpressionsTree();
-            //await InspectWebApiActionRoute();
-            //await CreateAnExpressionsTree();
+            await InspectAnExpressionsTree();
+            await InspectWebApiActionRoute();
+
+            await CreateAnExpressionsTree();
             await CrateQueryableFilterExpression();
         }
 
@@ -40,7 +41,7 @@ namespace FS.ExpressionsExplained.Client
             var right = (ConstantExpression)operation.Right;
 
             Console.WriteLine($"Expression: {param.Name} => {left.Name} {opertor} {right.Value}"); //Output:
-            // Expression: value => value Add 5
+            // Expression: value => value LessThan 5
 
             Console.WriteLine();
             return Task.CompletedTask;
@@ -77,8 +78,13 @@ namespace FS.ExpressionsExplained.Client
                 );
 
             var path = getCustomerAction.RelativePath;
-            var route = path.Replace("{id}", methodParamValue!.ToString());
-            Console.WriteLine(route);
+            var parameterName = getCustomerAction.ParameterDescriptions[0].Name;
+            var route = path.Replace($"{{{parameterName}}}", methodParamValue!.ToString());
+
+            Console.WriteLine(route); //Output:
+            // Customer/GetCustomer/5
+
+            Console.WriteLine();
         }
 
         private static Task CreateAnExpressionsTree()
@@ -92,7 +98,8 @@ namespace FS.ExpressionsExplained.Client
             var valueAddFiveExpr = Expression.Add(value, five);
 
             var addFiveLambda = Expression.Lambda<Func<int, int>>(body: valueAddFiveExpr, parameters: value);
-            Console.WriteLine(addFiveLambda);
+            Console.WriteLine(addFiveLambda); //Output:
+            // value => (value + 5)
 
             Console.WriteLine();
             return Task.CompletedTask;
@@ -104,6 +111,7 @@ namespace FS.ExpressionsExplained.Client
             Console.WriteLine("CrateQueryableFilterExpression");
             Console.WriteLine("------------------------");
 
+            // Filter 'person => person.Age < 5' for 'persons = new[] { Person { Name = "Eve", Age = 4 } }'
             var filter = "<5";
 
             // Build filter
@@ -138,8 +146,10 @@ namespace FS.ExpressionsExplained.Client
             var filteredPersons = persons.AsQueryable().Where(personAgeFilter).ToArray();
             //var filteredPersons = persons.Where(personAgeFilter.Compile()).ToArray();
 
-            Console.WriteLine($"persons: {joinPersons(persons)}");
-            Console.WriteLine($"filteredPersons: {joinPersons(filteredPersons)}");
+            Console.WriteLine($"persons: {joinPersons(persons)}"); //Output:
+            // persons: Person { Name = Eve, Age = 4 }, Person { Name = Joe, Age = 5 }, Person { Name = Amy, Age = 6 }
+            Console.WriteLine($"filteredPersons: {joinPersons(filteredPersons)}"); //Output:
+            // filteredPersons: Person { Name = Eve, Age = 4 }
 
             Console.WriteLine();
             return Task.CompletedTask;
